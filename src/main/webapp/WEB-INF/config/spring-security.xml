@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:beans="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <ldap-server ldif="classpath:users.ldif"/>
+
+
+    <http auto-config="true" use-expressions="true">
+        <intercept-url pattern="/login.html" access="permitAll" requires-channel="https" />
+        <intercept-url pattern="/loginFailed.html" access="permitAll" requires-channel="https"/>
+        <intercept-url pattern="/logout.html" access="permitAll" requires-channel="https"/>
+        <intercept-url pattern="/403.html" access="permitAll" requires-channel="https"/>
+        <intercept-url pattern="/**" access="hasRole('ROLE_USER')" requires-channel="https"/>
+        <form-login login-page="/login.html" authentication-failure-url="/loginFailed.html" />
+        <logout logout-success-url="/logout.html"/>
+        <access-denied-handler error-page="/403.jsp.html"/>
+    </http>
+
+    <authentication-manager>
+        <ldap-authentication-provider group-search-filter="member={0}"
+                                      group-search-base="ou=groups"
+                                      user-search-base="ou=people"
+                                      user-search-filter="uid={0}" />
+    </authentication-manager>
+
+
+
+
+
+    <!--<authentication-manager>-->
+        <!--<authentication-provider user-service-ref="userDetailsService">-->
+            <!--<user-service>-->
+                <!--<user name="andrii" password="secret" authorities="ROLE_USER"/>-->
+            <!--</user-service>-->
+        <!--</authentication-provider>-->
+        <!--<authentication-provider>-->
+            <!--<password-encoder hash="bcrypt"/>-->
+            <!--<jdbc-user-service data-source-ref="dataSource"/>-->
+        <!--</authentication-provider>-->
+    <!--</authentication-manager>-->
+
+    <!--<beans:bean id="userDetailsService" class="org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl">-->
+        <!--<beans:property name="dataSource" ref="dataSource"/>-->
+    <!--</beans:bean>-->
+
+</beans:beans>
